@@ -28,5 +28,6 @@ postgres:
     max-idle-time: 30m
     max-lifetime: 15m
 
-
-      
+session:
+  token-ttl: 168h
+  secret-key: ${SECRET_KEY}

@@ -7,6 +7,7 @@ type Config struct {
 	App      App      `yaml:"app" validate:"required"`
 	Server   Server   `yaml:"server" validate:"required"`
 	Postgres Postgres `yaml:"postgres" validate:"required"`
+	Session  Session  `yaml:"session" validate:"required"`
 }
 
 type App struct {
@@ -47,8 +48,14 @@ type PostgresConn struct {
 }
 
 type Postgres struct {
-	Host string       `yaml:"host" validate:"required,hostname"`
-	Port int          `yaml:"port" validate:"required,gte=1,lte=65535"`
-	Auth PostgresAuth `yaml:"auth" validate:"required"`
-	Conn PostgresConn `yaml:"conn" validate:"required"`
+	Host    string       `yaml:"host" validate:"required,hostname"`
+	Port    int          `yaml:"port" validate:"required,gte=1,lte=65535"`
+	SSLMode string       `yaml:"sslmode" validate:"required"`
+	Auth    PostgresAuth `yaml:"auth" validate:"required"`
+	Conn    PostgresConn `yaml:"conn" validate:"required"`
+}
+
+type Session struct {
+	TokenTTL  time.Duration `yaml:"token-ttl" validate:"required,min=1h"`
+	SecretKey string        `yaml:"secret-key" validate:"required"`
 }
