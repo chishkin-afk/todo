@@ -7,6 +7,7 @@ type Config struct {
 	App      App      `yaml:"app" validate:"required"`
 	Server   Server   `yaml:"server" validate:"required"`
 	Postgres Postgres `yaml:"postgres" validate:"required"`
+	Redis    Redis    `yaml:"redis" validate:"required"`
 	Session  Session  `yaml:"session" validate:"required"`
 }
 
@@ -58,4 +59,16 @@ type Postgres struct {
 type Session struct {
 	TokenTTL  time.Duration `yaml:"token-ttl" validate:"required,min=1h"`
 	SecretKey string        `yaml:"secret-key" validate:"required"`
+}
+
+type RedisAuth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	DB       int    `json:"db"`
+}
+
+type Redis struct {
+	Addr    string        `json:"addr" validate:"required,hostname_port"`
+	Auth    RedisAuth     `json:"auth"`
+	UserTTL time.Duration `json:"user-ttl" validate:"required,"`
 }

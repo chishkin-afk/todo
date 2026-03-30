@@ -13,3 +13,9 @@ type UserPersistenceRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
+
+type UserCacheRepository interface {
+	Save(ctx context.Context, user *User) error
+	Get(ctx context.Context, id uuid.UUID) (*User, error)
+	Del(ctx context.Context, id uuid.UUID) error
+}

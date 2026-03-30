@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"time"
 
 	"github.com/chishkin-afk/todo/internal/application/dtos"
 	"github.com/chishkin-afk/todo/internal/common/config"
@@ -18,6 +19,7 @@ type authService struct {
 	cfg                 *config.Config
 	log                 *slog.Logger
 	userPersistenceRepo user.UserPersistenceRepository
+	userCacheRepo       user.UserCacheRepository
 	jwtManager          session.JWTManager
 }
 
@@ -25,12 +27,14 @@ func New(
 	cfg *config.Config,
 	log *slog.Logger,
 	userPersistenceRepo user.UserPersistenceRepository,
+	userCacheRepo user.UserCacheRepository,
 	jwtManager session.JWTManager,
 ) *authService {
 	return &authService{
 		cfg:                 cfg,
 		log:                 log,
 		userPersistenceRepo: userPersistenceRepo,
+		userCacheRepo:       userCacheRepo,
 		jwtManager:          jwtManager,
 	}
 }
@@ -131,6 +135,24 @@ func (as *authService) GetSelf(ctx context.Context) (*dtos.User, error) {
 		return nil, err
 	}
 
+	if user, err := as.userCacheRepo.Get(ctx, userID); err == nil {
+		as.log.Debug("user was taken from cache",
+			slog.String("user_id", userID.String()),
+		)
+		return &dtos.User{
+			ID:        user.ID().String(),
+			Email:     user.Email().String(),
+			Username:  user.Username(),
+			CreatedAt: user.CreatedAt().UnixMilli(),
+			UpdatedAt: user.UpdatedAt().UnixMilli(),
+		}, nil
+	} else if !errors.Is(err, errs.ErrUserNotFound) {
+		as.log.Error("failed to get user from cache",
+			slog.String("error", err.Error()),
+			slog.String("user_id", userID.String()),
+		)
+	}
+
 	user, err := as.userPersistenceRepo.GetByID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) ||
@@ -146,6 +168,7 @@ func (as *authService) GetSelf(ctx context.Context) (*dtos.User, error) {
 		return nil, errs.ErrInternalServer
 	}
 
+	go as.saveUserCache(context.Background(), user)
 	return &dtos.User{
 		ID:        user.ID().String(),
 		Email:     user.Email().String(),
@@ -199,6 +222,7 @@ func (as *authService) Update(ctx context.Context, req *dtos.UpdateUserRequest) 
 		return nil, errs.ErrInternalServer
 	}
 
+	go as.deleteUserCache(context.Background(), updatedUser.ID())
 	return &dtos.User{
 		ID:        updatedUser.ID().String(),
 		Email:     updatedUser.Email().String(),
@@ -232,6 +256,7 @@ func (as *authService) Delete(ctx context.Context) error {
 		return errs.ErrInternalServer
 	}
 
+	go as.deleteUserCache(context.Background(), userID)
 	return nil
 }
 
@@ -264,4 +289,28 @@ func (as *authService) getUserID(ctx context.Context) (uuid.UUID, error) {
 	}
 
 	return uuid.Nil, errs.ErrInvalidToken
+}
+
+func (as *authService) saveUserCache(ctx context.Context, user *user.User) {
+	ctxTimeout, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	if err := as.userCacheRepo.Save(ctxTimeout, user); err != nil {
+		as.log.Error("failed to save user into cache",
+			slog.String("error", err.Error()),
+			slog.String("user_id", user.ID().String()),
+		)
+	}
+}
+
+func (as *authService) deleteUserCache(ctx context.Context, id uuid.UUID) {
+	ctxTimeout, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	if err := as.userCacheRepo.Del(ctxTimeout, id); err != nil {
+		as.log.Error("failed to save user into cache",
+			slog.String("error", err.Error()),
+			slog.String("user_id", id.String()),
+		)
+	}
 }

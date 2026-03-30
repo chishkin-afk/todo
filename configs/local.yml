@@ -28,6 +28,14 @@ postgres:
     max-idle-time: 30m
     max-lifetime: 15m
 
+redis:
+  addr: ${REDIS_ADDR}
+  auth:
+    username: ${REDIS_USERNAME}
+    password: ${REDIS_PASSWORD}
+    db: ${REDIS_DB}
+  user-ttl: 5m
+
 session:
   token-ttl: 168h
   secret-key: ${SECRET_KEY}
