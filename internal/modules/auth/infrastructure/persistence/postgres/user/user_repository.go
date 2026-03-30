@@ -55,8 +55,9 @@ func (ur *userPersistenceRepository) Update(ctx context.Context, user *user.User
 	_, err := ur.db.ExecContext(ctx, `update users set 
 		password_hash = $1,
 		username = $2,
-		email = $3 where id = $4
-	`, user.PasswordHash(), user.Username(), user.Email(), user.ID())
+		email = $3,
+		updated_at = $4 where id = $5
+	`, user.PasswordHash(), user.Username(), user.Email(), user.UpdatedAt(), user.ID())
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return nil, err
@@ -74,6 +75,23 @@ func (ur *userPersistenceRepository) Update(ctx context.Context, user *user.User
 
 func (ur *userPersistenceRepository) GetByEmail(ctx context.Context, email user.Email) (*user.User, error) {
 	result := ur.db.QueryRowContext(ctx, "select id, email, password_hash, username, created_at, updated_at from users where email = $1", email)
+	if err := result.Err(); err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return nil, err
+		}
+
+		if err, ok := ur.knownError(err); ok {
+			return nil, err
+		}
+
+		return nil, fmt.Errorf("failed to get user by email: %w", err)
+	}
+
+	return ToDomain(result)
+}
+
+func (ur *userPersistenceRepository) GetByID(ctx context.Context, id uuid.UUID) (*user.User, error) {
+	result := ur.db.QueryRowContext(ctx, "select id, email, password_hash, username, created_at, updated_at from users where id = $1", id)
 	if err := result.Err(); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return nil, err

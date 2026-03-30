@@ -15,4 +15,8 @@ var (
 
 	// General's
 	ErrInvalidToken = errors.New("invalid token")
+
+	// Service's
+	ErrInternalServer     = errors.New("internal server error")
+	ErrInvalidCredentials = errors.New("invalid credentials")
 )

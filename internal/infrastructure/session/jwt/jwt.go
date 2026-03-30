@@ -28,7 +28,7 @@ func New(cfg *config.Config) *jwtManager {
 func (jm *jwtManager) Generate(userID uuid.UUID) (string, error) {
 	secretKey := []byte(jm.cfg.Session.SecretKey)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, &customClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &customClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "todo-list",

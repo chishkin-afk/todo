@@ -13,6 +13,10 @@ func (ph PasswordHash) String() string {
 	return string(ph)
 }
 
+func (ph PasswordHash) Compare(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(ph), []byte(password)) == nil
+}
+
 func NewPasswordHash(raw string) (PasswordHash, error) {
 	raw = strings.TrimSpace(raw)
 	if len([]rune(raw)) < 6 || len([]rune(raw)) > 32 {
