@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	errs "github.com/chishkin-afk/todo/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -39,7 +40,35 @@ func TestNewUser_Invalid(t *testing.T) {
 		name     string
 		input    input
 		expected error
-	}{}
+	}{
+		{
+			name: "empty_email",
+			input: input{
+				email:    "",
+				password: "qwerty123",
+				username: "username",
+			},
+			expected: errs.ErrInvalidEmail,
+		},
+		{
+			name: "empty_password",
+			input: input{
+				email:    "mail@example.com",
+				password: "",
+				username: "username",
+			},
+			expected: errs.ErrInvalidPassword,
+		},
+		{
+			name: "empty_username",
+			input: input{
+				email:    "mail@example.com",
+				password: "qwerty123",
+				username: "",
+			},
+			expected: errs.ErrInvalidUsername,
+		},
+	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
