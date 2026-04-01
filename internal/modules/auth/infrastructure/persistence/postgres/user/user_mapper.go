@@ -21,6 +21,7 @@ func ToDomain(result *sql.Row) (*user.User, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errs.ErrUserNotFound
 		}
+
 		return nil, err
 	}
 

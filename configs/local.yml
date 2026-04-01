@@ -35,6 +35,7 @@ redis:
     password: ${REDIS_PASSWORD}
     db: ${REDIS_DB}
   user-ttl: 5m
+  group-ttl: 5m
 
 session:
   token-ttl: 168h

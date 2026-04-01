@@ -17,6 +17,8 @@ var (
 	ErrUserNotFound      = errors.New("user not found")
 	ErrUserAlreadyExists = errors.New("user already exists")
 	ErrGroupNotFound     = errors.New("group not found")
+	ErrTaskNotFound      = errors.New("task not found")
+	ErrDepsNotFound      = errors.New("some deps are not found")
 
 	// General's
 	ErrInvalidToken = errors.New("invalid token")

@@ -68,7 +68,8 @@ type RedisAuth struct {
 }
 
 type Redis struct {
-	Addr    string        `json:"addr" validate:"required,hostname_port"`
-	Auth    RedisAuth     `json:"auth"`
-	UserTTL time.Duration `json:"user-ttl" validate:"required,min=100ms"`
+	Addr     string        `json:"addr" validate:"required,hostname_port"`
+	Auth     RedisAuth     `json:"auth"`
+	UserTTL  time.Duration `json:"user-ttl" validate:"required,min=100ms"`
+	GroupTTL time.Duration `json:"group-ttl" validate:"required,min=100ms"`
 }

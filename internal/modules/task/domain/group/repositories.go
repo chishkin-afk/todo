@@ -13,3 +13,9 @@ type GroupPersistenceRepository interface {
 	Update(ctx context.Context, group *Group) (*Group, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
+
+type GroupCacheRepository interface {
+	Save(ctx context.Context, group *Group) error
+	Get(ctx context.Context, id uuid.UUID) (*Group, error)
+	Del(ctx context.Context, id uuid.UUID) error
+}
