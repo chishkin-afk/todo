@@ -22,6 +22,10 @@ func ToDomain(rows *sql.Rows) ([]*group.Group, error) {
 		var updatedAt time.Time
 
 		if err := rows.Scan(&id, &ownerID, &title, &createdAt, &updatedAt); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, errs.ErrGroupNotFound
+			}
+
 			return nil, err
 		}
 
@@ -37,6 +41,7 @@ func ToDomain(rows *sql.Rows) ([]*group.Group, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errs.ErrGroupNotFound
 		}
+
 		return nil, err
 	}
 
