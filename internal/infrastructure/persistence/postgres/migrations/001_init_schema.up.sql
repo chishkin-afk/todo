@@ -31,8 +31,8 @@ create table if not exists tasks (
     updated_at TIMESTAMPTZ NOT NULL,
 
 
-    FOREIGN KEY (owner_id) REFERENCES users(id),
-    FOREIGN KEY (group_id) REFERENCES groups(id)
+    FOREIGN KEY (owner_id) REFERENCES users(id), 
+    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
 );
 
 create index if not exists priority_idx ON tasks (priority_id);

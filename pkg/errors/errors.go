@@ -4,7 +4,7 @@ import "errors"
 
 var (
 	// Domain's
-	ErrInvalidID       = errors.New("invalid id of user")
+	ErrInvalidID       = errors.New("invalid id")
 	ErrInvalidEmail    = errors.New("invalid email of user")
 	ErrInvalidPassword = errors.New("len of password must be more than 6 and less than 32")
 	ErrInvalidUsername = errors.New("len of username must be more than 3 and less than 64")
@@ -23,9 +23,11 @@ var (
 	ErrDepsNotFound      = errors.New("some deps are not found")
 
 	// General's
-	ErrInvalidToken = errors.New("invalid token")
+	ErrInvalidToken      = errors.New("invalid token")
+	ErrTooManyRequests   = errors.New("too many requests")
 
 	// Service's
 	ErrInternalServer     = errors.New("internal server error")
+	ErrNotEnoughRights    = errors.New("not enough rights")
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )

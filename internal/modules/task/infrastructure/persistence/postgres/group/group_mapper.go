@@ -2,10 +2,12 @@ package grouppg
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/chishkin-afk/todo/internal/modules/task/domain/group"
 	"github.com/chishkin-afk/todo/internal/modules/task/domain/task"
+	errs "github.com/chishkin-afk/todo/pkg/errors"
 	"github.com/google/uuid"
 )
 
@@ -54,8 +56,8 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 		var tGroupID uuid.NullUUID
 		var tTitle sql.NullString
 		var tDesc sql.NullString
-		var tPriority int
-		var tIsDone bool
+		var tPriority sql.NullInt64
+		var tIsDone sql.NullBool
 		var tCreatedAt sql.NullTime
 		var tUpdatedAt sql.NullTime
 
@@ -64,6 +66,10 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 			&tID, &tOwnerID, &tGroupID, &tTitle, &tDesc, &tPriority, &tIsDone, &tCreatedAt, &tUpdatedAt,
 		)
 		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, errs.ErrGroupNotFound
+			}
+
 			return nil, err
 		}
 
@@ -76,7 +82,7 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 
 		if tID.Valid {
 			if _, exists := tasksMap[tID.UUID]; !exists {
-				priority, err := task.NewPriority(tPriority)
+				priority, err := task.NewPriority(int(tPriority.Int64))
 				if err != nil {
 					return nil, err
 				}
@@ -88,7 +94,7 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 					tTitle.String,
 					tDesc.String,
 					priority,
-					tIsDone,
+					tIsDone.Bool,
 					tCreatedAt.Time,
 					tUpdatedAt.Time,
 				)
@@ -101,11 +107,15 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errs.ErrGroupNotFound
+		}
+
 		return nil, err
 	}
 
 	if currentGroup == nil {
-		return nil, sql.ErrNoRows
+		return nil, errs.ErrGroupNotFound
 	}
 
 	tasks := make([]*task.Task, 0, len(tasksMap))

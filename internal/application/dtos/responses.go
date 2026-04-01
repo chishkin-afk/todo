@@ -16,7 +16,7 @@ type Group struct {
 	ID        string `json:"id"`
 	OwnerID   string `json:"owner_id"`
 	Title     string `json:"title"`
-	Tasks     []Task `json:"tasks"`
+	Tasks     []Task `json:"tasks,omitempty"`
 	CreatedAt int64  `json:"created_at"`
 	UpdatedAt int64  `json:"updated_at"`
 }
@@ -29,8 +29,15 @@ type Task struct {
 	Desc       string `json:"desc"`
 	Priority   string `json:"priority"`
 	PriorityID int64  `json:"priority_id"`
+	IsDone     bool   `json:"is_done"`
+	CreatedAt  int64  `json:"created_at"`
+	UpdatedAt  int64  `json:"updated_at"`
 }
 
 type Groups struct {
 	Groups []Group `json:"groups"`
+}
+
+type ErrMsg struct {
+	Error string `json:"error"`
 }

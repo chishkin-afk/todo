@@ -71,7 +71,7 @@ func (gpr *groupPersistenceRepository) GetByID(ctx context.Context, groupID uuid
 	rows, err := gpr.db.QueryContext(ctx, `
 		select 
 			g.id, g.owner_id, g.title, g.created_at, g.updated_at,
-			t.id, t.owner_id, t.group_id, t.title, t.task_desc, t.priority_id, t.created_at, t.updated_at
+			t.id, t.owner_id, t.group_id, t.title, t.task_desc, t.priority_id, t.is_done, t.created_at, t.updated_at
 		from groups g
 		left join tasks t on g.id = t.group_id
 		where g.id = $1
@@ -94,9 +94,10 @@ func (gpr *groupPersistenceRepository) GetByID(ctx context.Context, groupID uuid
 
 func (gpr *groupPersistenceRepository) Update(ctx context.Context, group *group.Group) (*group.Group, error) {
 	_, err := gpr.db.ExecContext(ctx, `update groups set
-		title = $1
-		where id = $2
-	`, group.Title(), group.ID())
+		title = $1,
+		updated_at = $2
+		where id = $3
+	`, group.Title(), group.UpdatedAt(), group.ID())
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return nil, err
@@ -113,7 +114,7 @@ func (gpr *groupPersistenceRepository) Update(ctx context.Context, group *group.
 }
 
 func (gpr *groupPersistenceRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	result, err := gpr.db.ExecContext(ctx, `delete from groups CASCADE where id = $1`, id)
+	result, err := gpr.db.ExecContext(ctx, `delete from groups where id = $1`, id)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return err

@@ -82,8 +82,9 @@ func (tpr *taskPersistenceRepository) Update(ctx context.Context, task *task.Tas
 	_, err := tpr.db.ExecContext(ctx, `update tasks set
 		priority_id = $1,
 		title = $2,
-		task_desc = $3
-		where id = $4`, task.Priority().Int(), task.Title(), task.Desc(), task.ID())
+		task_desc = $3,
+		is_done = $4
+		where id = $5`, task.Priority().Int(), task.Title(), task.Desc(), task.IsDone(), task.ID())
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return nil, err

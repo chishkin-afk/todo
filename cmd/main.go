@@ -2,34 +2,46 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/chishkin-afk/todo/internal/common/config"
-	"github.com/chishkin-afk/todo/internal/infrastructure/persistence/postgres"
-	grouppg "github.com/chishkin-afk/todo/internal/modules/task/infrastructure/persistence/postgres/group"
-	taskpg "github.com/chishkin-afk/todo/internal/modules/task/infrastructure/persistence/postgres/task"
-	"github.com/google/uuid"
-	"github.com/joho/godotenv"
+	"github.com/chishkin-afk/todo/internal/app"
 )
 
 func main() {
-	godotenv.Load(".env")
-	cfg, err := config.New().Init(os.Getenv("APP_CONFIG_PATH"))
-	fmt.Println(err)
-	db, err := postgres.Connect(cfg)
+	app, cleanup, err := app.New()
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error("failed to setup app",
+			slog.String("error", err.Error()),
+		)
 		os.Exit(1)
 	}
+	defer cleanup()
 
-	fmt.Println(postgres.MigrateUP(context.TODO(), db))
+	go func() {
+		if err := app.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.Error("failed to start server",
+				slog.String("error", err.Error()),
+			)
+		}
+	}()
 
-	gr := grouppg.New(db)
-	fmt.Println(gr.GetByID(context.Background(), uuid.MustParse("873b6077-ccca-473e-b4a4-61abcb3c7ee2")))
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
 
-	tr := taskpg.New(db)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-	fmt.Println(tr.Delete(context.TODO(), uuid.MustParse("b4e1aec2-a681-4f11-a786-0a8def83af2a")))
+	if err := app.Shutdown(ctx); err != nil {
+		slog.Error("failed to shutdown server",
+			slog.String("error", err.Error()),
+		)
+		os.Exit(1)
+	}
 }

@@ -1,6 +1,7 @@
 package task
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -103,6 +104,7 @@ func (t *Task) Done() error {
 }
 
 func (t *Task) NotDone() error {
+	fmt.Println(t.isDone)
 	if !t.isDone {
 		return errs.ErrTaskNotDone
 	}
