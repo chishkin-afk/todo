@@ -30,11 +30,12 @@ func (tpr *taskPersistenceRepository) Save(ctx context.Context, task *task.Task)
 		title,
 		task_desc,
 		priority_id,
+		is_done,
 		created_at,
 		updated_at
 	) values (
-		$1, $2, $3, $4, $5, $6, $7, $8
-	)`, task.ID(), task.OwnerID(), task.GroupID(), task.Title(), task.Desc(), task.Priority().Int(), task.CreatedAt(), task.UpdatedAt())
+		$1, $2, $3, $4, $5, $6, $7, $8, $9
+	)`, task.ID(), task.OwnerID(), task.GroupID(), task.Title(), task.Desc(), task.Priority().Int(), task.IsDone(), task.CreatedAt(), task.UpdatedAt())
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return nil, err
@@ -58,6 +59,7 @@ func (tpr *taskPersistenceRepository) GetByID(ctx context.Context, id uuid.UUID)
 		title,
 		task_desc,
 		priority_id,
+		is_done,
 		created_at,
 		updated_at
 	from tasks where id = $1`, id)

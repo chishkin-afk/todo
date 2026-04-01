@@ -15,6 +15,7 @@ type Task struct {
 	title     string
 	desc      string
 	priority  priority
+	isDone    bool
 	createdAt time.Time
 	updatedAt time.Time
 }
@@ -47,6 +48,7 @@ func New(
 		title:     title,
 		desc:      desc,
 		priority:  priority,
+		isDone:    false,
 		createdAt: time.Now().UTC(),
 		updatedAt: time.Now().UTC(),
 	}, nil
@@ -59,6 +61,7 @@ func From(
 	title string,
 	desc string,
 	priority priority,
+	isDone bool,
 	createdAt time.Time,
 	updatedAt time.Time,
 ) (*Task, error) {
@@ -83,9 +86,30 @@ func From(
 		title:     title,
 		desc:      desc,
 		priority:  priority,
+		isDone:    isDone,
 		createdAt: createdAt,
 		updatedAt: updatedAt,
 	}, nil
+}
+
+func (t *Task) Done() error {
+	if t.isDone {
+		return errs.ErrTaskAlreadyDone
+	}
+
+	t.isDone = true
+	t.updatedAt = time.Now().UTC()
+	return nil
+}
+
+func (t *Task) NotDone() error {
+	if !t.isDone {
+		return errs.ErrTaskNotDone
+	}
+
+	t.isDone = false
+	t.updatedAt = time.Now().UTC()
+	return nil
 }
 
 func (t *Task) ChangePriority(priority priority) error {
@@ -142,6 +166,10 @@ func (t *Task) Desc() string {
 
 func (t *Task) Priority() priority {
 	return t.priority
+}
+
+func (t *Task) IsDone() bool {
+	return t.isDone
 }
 
 func (t *Task) CreatedAt() time.Time {

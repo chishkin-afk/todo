@@ -13,6 +13,7 @@ type TaskModel struct {
 	Title      string
 	TaskDesc   string
 	PriorityID int
+	IsDone     bool
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }

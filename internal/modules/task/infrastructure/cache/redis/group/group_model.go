@@ -22,6 +22,7 @@ type TaskModel struct {
 	Title      string    `json:"title"`
 	Desc       string    `json:"desc"`
 	PriorityID int       `json:"priority_id"`
+	IsDone     bool      `json:"is_done"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }

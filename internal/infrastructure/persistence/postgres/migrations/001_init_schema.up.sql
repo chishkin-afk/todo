@@ -26,6 +26,7 @@ create table if not exists tasks (
     title VARCHAR(64) NOT NULL,
     task_desc VARCHAR(512) NOT NULL,
     priority_id INT DEFAULT 0,
+    is_done BOOLEAN,
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
 

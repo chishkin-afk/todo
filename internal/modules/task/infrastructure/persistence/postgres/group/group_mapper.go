@@ -2,12 +2,10 @@ package grouppg
 
 import (
 	"database/sql"
-	"errors"
 	"time"
 
 	"github.com/chishkin-afk/todo/internal/modules/task/domain/group"
 	"github.com/chishkin-afk/todo/internal/modules/task/domain/task"
-	errs "github.com/chishkin-afk/todo/pkg/errors"
 	"github.com/google/uuid"
 )
 
@@ -22,10 +20,6 @@ func ToDomain(rows *sql.Rows) ([]*group.Group, error) {
 		var updatedAt time.Time
 
 		if err := rows.Scan(&id, &ownerID, &title, &createdAt, &updatedAt); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return nil, errs.ErrGroupNotFound
-			}
-
 			return nil, err
 		}
 
@@ -38,10 +32,6 @@ func ToDomain(rows *sql.Rows) ([]*group.Group, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errs.ErrGroupNotFound
-		}
-
 		return nil, err
 	}
 
@@ -53,26 +43,25 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 	tasksMap := make(map[uuid.UUID]*task.Task)
 
 	for rows.Next() {
-		var (
-			gID        uuid.UUID
-			gOwnerID   uuid.UUID
-			gTitle     string
-			gCreatedAt time.Time
-			gUpdatedAt time.Time
+		var gID uuid.UUID
+		var gOwnerID uuid.UUID
+		var gTitle string
+		var gCreatedAt time.Time
+		var gUpdatedAt time.Time
 
-			tID        uuid.NullUUID
-			tOwnerID   uuid.NullUUID
-			tGroupID   uuid.NullUUID
-			tTitle     sql.NullString
-			tDesc      sql.NullString
-			tPriority  int
-			tCreatedAt sql.NullTime
-			tUpdatedAt sql.NullTime
-		)
+		var tID uuid.NullUUID
+		var tOwnerID uuid.NullUUID
+		var tGroupID uuid.NullUUID
+		var tTitle sql.NullString
+		var tDesc sql.NullString
+		var tPriority int
+		var tIsDone bool
+		var tCreatedAt sql.NullTime
+		var tUpdatedAt sql.NullTime
 
 		err := rows.Scan(
 			&gID, &gOwnerID, &gTitle, &gCreatedAt, &gUpdatedAt,
-			&tID, &tOwnerID, &tGroupID, &tTitle, &tDesc, &tPriority, &tCreatedAt, &tUpdatedAt,
+			&tID, &tOwnerID, &tGroupID, &tTitle, &tDesc, &tPriority, &tIsDone, &tCreatedAt, &tUpdatedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -99,6 +88,7 @@ func ToDomainWithTasks(rows *sql.Rows) (*group.Group, error) {
 					tTitle.String,
 					tDesc.String,
 					priority,
+					tIsDone,
 					tCreatedAt.Time,
 					tUpdatedAt.Time,
 				)

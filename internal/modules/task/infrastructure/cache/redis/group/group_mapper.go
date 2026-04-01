@@ -25,6 +25,7 @@ func ToBytes(domain *group.Group) ([]byte, error) {
 			Title:      task.Title(),
 			Desc:       task.Desc(),
 			PriorityID: task.Priority().Int(),
+			IsDone:     task.IsDone(),
 			CreatedAt:  task.CreatedAt(),
 			UpdatedAt:  task.UpdatedAt(),
 		}
@@ -53,6 +54,7 @@ func ToDomain(bytes []byte) (*group.Group, error) {
 			modelTask.Title,
 			modelTask.Desc,
 			priority,
+			modelTask.IsDone,
 			modelTask.CreatedAt,
 			modelTask.UpdatedAt,
 		)

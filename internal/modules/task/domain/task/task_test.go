@@ -24,6 +24,7 @@ func TestNewTask_Success(t *testing.T) {
 	assert.Equal(t, title, task.Title())
 	assert.Equal(t, desc, task.Desc())
 	assert.Equal(t, priority, task.Priority())
+	assert.False(t, task.IsDone())
 	assert.Equal(t, ownerID, task.OwnerID())
 	assert.Equal(t, groupID, task.GroupID())
 	assert.WithinDuration(t, now, task.CreatedAt(), 100*time.Millisecond)
@@ -117,10 +118,11 @@ func TestFromTask_Success(t *testing.T) {
 	title := "Existing Task"
 	desc := "Description of existing task"
 	priority := PRIORITY_MIDDLE
+	isDone := true
 	createdAt := time.Date(2023, 1, 1, 12, 0, 0, 0, time.UTC)
 	updatedAt := time.Date(2023, 1, 2, 14, 0, 0, 0, time.UTC)
 
-	task, err := From(id, ownerID, groupID, title, desc, priority, createdAt, updatedAt)
+	task, err := From(id, ownerID, groupID, title, desc, priority, isDone, createdAt, updatedAt)
 
 	require.NoError(t, err)
 	assert.Equal(t, id, task.ID())
@@ -129,6 +131,7 @@ func TestFromTask_Success(t *testing.T) {
 	assert.Equal(t, title, task.Title())
 	assert.Equal(t, desc, task.Desc())
 	assert.Equal(t, priority, task.Priority())
+	assert.Equal(t, isDone, task.IsDone())
 	assert.Equal(t, createdAt, task.CreatedAt())
 	assert.Equal(t, updatedAt, task.UpdatedAt())
 }
@@ -172,7 +175,7 @@ func TestFromTask_Invalid(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := From(id, ownerID, groupID, tc.title, tc.desc, tc.priority, time.Now(), time.Now())
+			_, err := From(id, ownerID, groupID, tc.title, tc.desc, tc.priority, false, time.Now(), time.Now())
 			assert.EqualError(t, err, tc.expected.Error())
 		})
 	}
@@ -232,4 +235,45 @@ func TestTask_ChangeDesc_Invalid(t *testing.T) {
 
 	err = task.ChangeDesc("ab")
 	assert.EqualError(t, err, errs.ErrInvalidTaskDesc.Error())
+}
+
+func TestTask_Done(t *testing.T) {
+	task, err := New(uuid.New(), uuid.New(), "Test Title", "Test Desc", PRIORITY_LOW)
+	require.NoError(t, err)
+	require.False(t, task.IsDone())
+
+	err = task.Done()
+	require.NoError(t, err)
+	assert.True(t, task.IsDone())
+	assert.NotEqual(t, task.CreatedAt(), task.UpdatedAt())
+}
+
+func TestTask_Done_AlreadyDone(t *testing.T) {
+	task, err := New(uuid.New(), uuid.New(), "Test Title", "Test Desc", PRIORITY_LOW)
+	require.NoError(t, err)
+	_ = task.Done()
+
+	err = task.Done()
+	assert.EqualError(t, err, errs.ErrTaskAlreadyDone.Error())
+}
+
+func TestTask_NotDone(t *testing.T) {
+	task, err := New(uuid.New(), uuid.New(), "Test Title", "Test Desc", PRIORITY_LOW)
+	require.NoError(t, err)
+	_ = task.Done()
+	require.True(t, task.IsDone())
+
+	err = task.NotDone()
+	require.NoError(t, err)
+	assert.False(t, task.IsDone())
+	assert.NotEqual(t, task.CreatedAt(), task.UpdatedAt())
+}
+
+func TestTask_NotDone_AlreadyNotDone(t *testing.T) {
+	task, err := New(uuid.New(), uuid.New(), "Test Title", "Test Desc", PRIORITY_LOW)
+	require.NoError(t, err)
+	require.False(t, task.IsDone())
+
+	err = task.NotDone()
+	assert.EqualError(t, err, errs.ErrTaskNotDone.Error())
 }

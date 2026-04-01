@@ -18,6 +18,7 @@ func ToDomain(result *sql.Row) (*task.Task, error) {
 		&model.Title,
 		&model.TaskDesc,
 		&model.PriorityID,
+		&model.IsDone,
 		&model.CreatedAt,
 		&model.UpdatedAt,
 	); err != nil {
@@ -40,6 +41,7 @@ func ToDomain(result *sql.Row) (*task.Task, error) {
 		model.Title,
 		model.TaskDesc,
 		priority,
+		model.IsDone,
 		model.CreatedAt,
 		model.UpdatedAt,
 	)

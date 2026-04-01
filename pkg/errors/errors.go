@@ -12,6 +12,8 @@ var (
 	ErrInvalidTitle        = errors.New("len of title must be more than 3 and less than 64")
 	ErrInvalidTaskDesc     = errors.New("len of desc must be more than 3 and less than 512")
 	ErrInvalidTaskPriority = errors.New("invalid priority")
+	ErrTaskAlreadyDone     = errors.New("task is already done")
+	ErrTaskNotDone         = errors.New("task isn't done")
 
 	// Repository's
 	ErrUserNotFound      = errors.New("user not found")
