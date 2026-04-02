@@ -8,6 +8,8 @@ import (
 	"github.com/chishkin-afk/todo/internal/common/config"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type authService interface {
@@ -71,6 +73,8 @@ func New(cfg *config.Config, as authService, ts taskService, mls []gin.HandlerFu
 
 		}
 	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router, nil
 }

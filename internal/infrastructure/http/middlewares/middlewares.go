@@ -19,7 +19,7 @@ type jwtManager interface {
 
 func AuthMiddleware(jm jwtManager, noAuth map[string]bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if noAuth[ctx.Request.URL.Path] {
+		if noAuth[ctx.FullPath()] {
 			ctx.Next()
 			return
 		}

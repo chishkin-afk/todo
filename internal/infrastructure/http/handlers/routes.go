@@ -16,6 +16,17 @@ type Routes struct {
 	ts taskService
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user account with email and password.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body dtos.RegisterRequest true "Registration details"
+// @Success 201 {object} dtos.Token "User created successfully"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 409 {object} dtos.ErrMsg "User already exists"
+// @Router /api/v1/register [post]
 func (r *Routes) Register() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.RegisterRequest
@@ -38,6 +49,17 @@ func (r *Routes) Register() gin.HandlerFunc {
 	}
 }
 
+// Login godoc
+// @Summary Login user
+// @Description Authenticate user with email and password.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body dtos.LoginRequest true "Login credentials"
+// @Success 200 {object} dtos.Token "Login successful"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 401 {object} dtos.ErrMsg "Invalid credentials"
+// @Router /api/v1/login [post]
 func (r *Routes) Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.LoginRequest
@@ -60,6 +82,15 @@ func (r *Routes) Login() gin.HandlerFunc {
 	}
 }
 
+// GetSelf godoc
+// @Summary Get current user info
+// @Description Retrieve information about the currently authenticated user.
+// @Tags User
+// @Produce json
+// @Security jwt
+// @Success 200 {object} dtos.User "User information"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Router /api/v1/user [get]
 func (r *Routes) GetSelf() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		resp, err := r.as.GetSelf(ctx.Request.Context())
@@ -74,6 +105,18 @@ func (r *Routes) GetSelf() gin.HandlerFunc {
 	}
 }
 
+// UpdateUser godoc
+// @Summary Update user info
+// @Description Update information of the currently authenticated user.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security jwt
+// @Param request body dtos.UpdateUserRequest true "Update details"
+// @Success 200 {object} dtos.User "Updated user information"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Router /api/v1/user [patch]
 func (r *Routes) UpdateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.UpdateUserRequest
@@ -96,6 +139,14 @@ func (r *Routes) UpdateUser() gin.HandlerFunc {
 	}
 }
 
+// DeleteUser godoc
+// @Summary Delete user account
+// @Description Delete the currently authenticated user account.
+// @Tags User
+// @Security jwt
+// @Success 204 "Account deleted"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Router /api/v1/user [delete]
 func (r *Routes) DeleteUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if err := r.as.Delete(ctx.Request.Context()); err != nil {
@@ -109,6 +160,18 @@ func (r *Routes) DeleteUser() gin.HandlerFunc {
 	}
 }
 
+// CreateGroup godoc
+// @Summary Create a new group
+// @Description Create a new task group for the user.
+// @Tags Groups
+// @Accept json
+// @Produce json
+// @Security jwt
+// @Param request body dtos.CreateGroupRequest true "Group details"
+// @Success 201 {object} dtos.Group "Group created"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Router /api/v1/group [post]
 func (r *Routes) CreateGroup() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.CreateGroupRequest
@@ -131,6 +194,19 @@ func (r *Routes) CreateGroup() gin.HandlerFunc {
 	}
 }
 
+// UpdateGroup godoc
+// @Summary Update a group
+// @Description Update an existing task group.
+// @Tags Groups
+// @Accept json
+// @Produce json
+// @Security jwt
+// @Param request body dtos.UpdateGroupRequest true "Update details"
+// @Success 200 {object} dtos.Group "Group updated"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Failure 404 {object} dtos.ErrMsg "Group not found"
+// @Router /api/v1/group [patch]
 func (r *Routes) UpdateGroup() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.UpdateGroupRequest
@@ -153,6 +229,17 @@ func (r *Routes) UpdateGroup() gin.HandlerFunc {
 	}
 }
 
+// DeleteGroup godoc
+// @Summary Delete a group
+// @Description Delete an existing task group by ID.
+// @Tags Groups
+// @Security jwt
+// @Param id path string true "Group ID" format(uuid)
+// @Success 204 "Group deleted"
+// @Failure 400 {object} dtos.ErrMsg "Invalid ID"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Failure 404 {object} dtos.ErrMsg "Group not found"
+// @Router /api/v1/group/{id} [delete]
 func (r *Routes) DeleteGroup() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -174,6 +261,15 @@ func (r *Routes) DeleteGroup() gin.HandlerFunc {
 	}
 }
 
+// GetListGroupsByUserID godoc
+// @Summary Get all user groups
+// @Description Retrieve a list of all task groups for the current user.
+// @Tags Groups
+// @Produce json
+// @Security jwt
+// @Success 200 {array} dtos.Group "List of groups"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Router /api/v1/groups [get]
 func (r *Routes) GetListGroupsByUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		resp, err := r.ts.GetListGroupsByUserID(ctx.Request.Context())
@@ -188,6 +284,18 @@ func (r *Routes) GetListGroupsByUserID() gin.HandlerFunc {
 	}
 }
 
+// GetGroupByID godoc
+// @Summary Get group by ID
+// @Description Retrieve a specific task group by ID.
+// @Tags Groups
+// @Produce json
+// @Security jwt
+// @Param id path string true "Group ID" format(uuid)
+// @Success 200 {object} dtos.Group "Group details"
+// @Failure 400 {object} dtos.ErrMsg "Invalid ID"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Failure 404 {object} dtos.ErrMsg "Group not found"
+// @Router /api/v1/group/{id} [get]
 func (r *Routes) GetGroupByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -210,6 +318,19 @@ func (r *Routes) GetGroupByID() gin.HandlerFunc {
 	}
 }
 
+// CreateTask godoc
+// @Summary Create a new task
+// @Description Create a new task within a group.
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Security jwt
+// @Param request body dtos.CreateTaskRequest true "Task details"
+// @Success 201 {object} dtos.Task "Task created"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Failure 404 {object} dtos.ErrMsg "Group not found"
+// @Router /api/v1/task [post]
 func (r *Routes) CreateTask() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.CreateTaskRequest
@@ -232,6 +353,19 @@ func (r *Routes) CreateTask() gin.HandlerFunc {
 	}
 }
 
+// UpdateTask godoc
+// @Summary Update a task
+// @Description Update an existing task.
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Security jwt
+// @Param request body dtos.UpdateTaskRequest true "Update details"
+// @Success 200 {object} dtos.Task "Task updated"
+// @Failure 400 {object} dtos.ErrMsg "Invalid request"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Failure 404 {object} dtos.ErrMsg "Task not found"
+// @Router /api/v1/task [patch]
 func (r *Routes) UpdateTask() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dtos.UpdateTaskRequest
@@ -254,6 +388,17 @@ func (r *Routes) UpdateTask() gin.HandlerFunc {
 	}
 }
 
+// DeleteTask godoc
+// @Summary Delete a task
+// @Description Delete an existing task by ID.
+// @Tags Tasks
+// @Security jwt
+// @Param id path string true "Task ID" format(uuid)
+// @Success 204 "Task deleted"
+// @Failure 400 {object} dtos.ErrMsg "Invalid ID"
+// @Failure 401 {object} dtos.ErrMsg "Unauthorized"
+// @Failure 404 {object} dtos.ErrMsg "Task not found"
+// @Router /api/v1/task/{id} [delete]
 func (r *Routes) DeleteTask() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))

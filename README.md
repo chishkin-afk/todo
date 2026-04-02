@@ -16,6 +16,7 @@ A robust, production-ready Todo List API built with Go, following Clean Architec
   - Efficient PostgreSQL connection pooling.
 - **Dockerized**: Ready-to-run with `docker-compose`, including health checks and data persistence.
 - **Graceful Shutdown**: Handles SIGINT/SIGTERM signals to complete active requests before stopping.
+- **API Documentation**: Interactive Swagger UI generated automatically from code annotations.
 
 ## 🛠 Tech Stack
 
@@ -28,6 +29,7 @@ A robust, production-ready Todo List API built with Go, following Clean Architec
 - **Logging**: Standard `log/slog`
 - **Testing**: `stretchr/testify`
 - **Infrastructure**: Docker, Docker Compose, Make
+- **Documentation**: Swaggo (Swagger 2.0 for Go)
 
 ## 📂 Project Structure
 
@@ -35,6 +37,10 @@ A robust, production-ready Todo List API built with Go, following Clean Architec
 ├── cmd/                      # Application entry point (main.go)
 ├── configs/                  # YAML configuration files
 ├── certs/                    # TLS certificates (server.crt, server.key)
+├── docs/                     # Generated Swagger documentation
+│   ├── docs.go               # Swagger initialization code
+│   ├── swagger.json          # JSON specification
+│   └── swagger.yaml          # YAML specification
 ├── internal/                 # Private application logic
 │   ├── app/                  # App assembly, wiring, and management
 │   ├── application/          # Use cases, DTOs (requests/responses)
@@ -69,6 +75,7 @@ A robust, production-ready Todo List API built with Go, following Clean Architec
 Prerequisites:
 - Docker & Docker Compose
 - Make
+- Go 1.21+ (for local development and docs generation)
 - (Optional) `mkcert` for local TLS generation
 
 ### 1. Run the Service
@@ -92,6 +99,27 @@ If you need to regenerate self-signed certificates for local development:
 ```bash
 make localtls
 ```
+
+## 📖 API Documentation
+
+This project uses [Swag](https://github.com/swaggo/swag) to generate Swagger 2.0 documentation directly from Go source code comments.
+
+### Generating Docs
+
+To regenerate the documentation after changing handlers or DTOs, run:
+
+```bash
+swag init -g cmd/main.go -o ./docs
+```
+
+### Viewing Swagger UI
+
+Once the server is running, you can access the interactive API documentation at:
+
+- **Swagger UI**: `http://localhost:9000/swagger/index.html`
+- **Swagger JSON**: `http://localhost:9000/swagger/doc.json`
+
+*Note: Ensure the server is running on the host defined in `@host` annotation (default: `localhost:9000`).*
 
 ## ⚙️ Configuration
 

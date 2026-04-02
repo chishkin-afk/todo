@@ -10,10 +10,34 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/chishkin-afk/todo/docs"
 	"github.com/chishkin-afk/todo/internal/app"
 )
 
+// @title Todo list API
+// @version 1.0
+// @description API for creating task & groups to do something useful
+// @termsOfService http://swagger.io/terms/
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:9000
+// @BasePath /api/v1
+// @schemes http https
+
+// @securityDefinitions.apikey jwt
+// @in header
+// @name Authorization
+// @description Type JWT token.
 func main() {
+	docs.SwaggerInfo.Title = "Todo list API"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Description = "API for creating task & groups to do something useful"
+	docs.SwaggerInfo.Host = "localhost:9000"
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
 	app, cleanup, err := app.New()
 	if err != nil {
 		slog.Error("failed to setup app",

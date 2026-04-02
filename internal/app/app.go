@@ -134,6 +134,7 @@ func provideServer(cfg *config.Config, log *slog.Logger, db *sql.DB, client *red
 		middlewares.AuthMiddleware(jwtManager, map[string]bool{
 			"/api/v1/register": true,
 			"/api/v1/login":    true,
+			"/swagger/*any":    true,
 		}),
 		middlewares.RateLimitMiddleware(10, time.Second),
 	})

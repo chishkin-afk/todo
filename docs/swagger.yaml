@@ -1,0 +1,523 @@
+basePath: /api/v1
+definitions:
+  dtos.CreateGroupRequest:
+    properties:
+      title:
+        type: string
+    type: object
+  dtos.CreateTaskRequest:
+    properties:
+      desc:
+        type: string
+      group_id:
+        type: string
+      priority_id:
+        type: integer
+      title:
+        type: string
+    type: object
+  dtos.ErrMsg:
+    properties:
+      error:
+        type: string
+    type: object
+  dtos.Group:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: string
+      owner_id:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/dtos.Task'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+  dtos.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dtos.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  dtos.Task:
+    properties:
+      created_at:
+        type: integer
+      desc:
+        type: string
+      group_id:
+        type: string
+      id:
+        type: string
+      is_done:
+        type: boolean
+      owner_id:
+        type: string
+      priority:
+        type: string
+      priority_id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+  dtos.Token:
+    properties:
+      token:
+        type: string
+    type: object
+  dtos.UpdateGroupRequest:
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  dtos.UpdateTaskRequest:
+    properties:
+      desc:
+        type: string
+      id:
+        type: string
+      is_done:
+        type: boolean
+      priority_id:
+        type: integer
+      title:
+        type: string
+    type: object
+  dtos.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  dtos.User:
+    properties:
+      created_at:
+        type: integer
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:9000
+info:
+  contact: {}
+  description: API for creating task & groups to do something useful
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Todo list API
+  version: "1.0"
+paths:
+  /api/v1/group:
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing task group.
+      parameters:
+      - description: Update details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Group updated
+          schema:
+            $ref: '#/definitions/dtos.Group'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "404":
+          description: Group not found
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Update a group
+      tags:
+      - Groups
+    post:
+      consumes:
+      - application/json
+      description: Create a new task group for the user.
+      parameters:
+      - description: Group details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Group created
+          schema:
+            $ref: '#/definitions/dtos.Group'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Create a new group
+      tags:
+      - Groups
+  /api/v1/group/{id}:
+    delete:
+      description: Delete an existing task group by ID.
+      parameters:
+      - description: Group ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Group deleted
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "404":
+          description: Group not found
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Delete a group
+      tags:
+      - Groups
+    get:
+      description: Retrieve a specific task group by ID.
+      parameters:
+      - description: Group ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Group details
+          schema:
+            $ref: '#/definitions/dtos.Group'
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "404":
+          description: Group not found
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Get group by ID
+      tags:
+      - Groups
+  /api/v1/groups:
+    get:
+      description: Retrieve a list of all task groups for the current user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of groups
+          schema:
+            items:
+              $ref: '#/definitions/dtos.Group'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Get all user groups
+      tags:
+      - Groups
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/dtos.Token'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      summary: Login user
+      tags:
+      - Auth
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with email and password.
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/dtos.Token'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      summary: Register a new user
+      tags:
+      - Auth
+  /api/v1/task:
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing task.
+      parameters:
+      - description: Update details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task updated
+          schema:
+            $ref: '#/definitions/dtos.Task'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "404":
+          description: Task not found
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Update a task
+      tags:
+      - Tasks
+    post:
+      consumes:
+      - application/json
+      description: Create a new task within a group.
+      parameters:
+      - description: Task details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Task created
+          schema:
+            $ref: '#/definitions/dtos.Task'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "404":
+          description: Group not found
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Create a new task
+      tags:
+      - Tasks
+  /api/v1/task/{id}:
+    delete:
+      description: Delete an existing task by ID.
+      parameters:
+      - description: Task ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Task deleted
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "404":
+          description: Task not found
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Delete a task
+      tags:
+      - Tasks
+  /api/v1/user:
+    delete:
+      description: Delete the currently authenticated user account.
+      responses:
+        "204":
+          description: Account deleted
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Delete user account
+      tags:
+      - User
+    get:
+      description: Retrieve information about the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information
+          schema:
+            $ref: '#/definitions/dtos.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Get current user info
+      tags:
+      - User
+    patch:
+      consumes:
+      - application/json
+      description: Update information of the currently authenticated user.
+      parameters:
+      - description: Update details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated user information
+          schema:
+            $ref: '#/definitions/dtos.User'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrMsg'
+      security:
+      - jwt: []
+      summary: Update user info
+      tags:
+      - User
+schemes:
+- http
+- https
+securityDefinitions:
+  jwt:
+    description: Type JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
