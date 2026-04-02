@@ -5,5 +5,7 @@
 *.pem
 *.key
 *.key.pub
+*.crt
+/certs
 
 /bin
