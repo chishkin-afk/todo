@@ -7,7 +7,7 @@ server:
   http:
     addr: ${HTTP_ADDR}
     tls:
-      enable: true 
+      enable: false 
       server-cert-path: ./certs/server.crt
       server-key-path: ./certs/server.key
   read-timeout: 2s
