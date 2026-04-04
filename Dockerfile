@@ -18,6 +18,7 @@ WORKDIR /root/
 COPY --from=builder /app/todo .
 
 COPY --from=builder /app/configs ./configs/
+COPY --from=builder /app/docs ./docs/
 COPY --from=builder /app/internal/infrastructure/persistence/postgres/migrations ./internal/infrastructure/persistence/postgres/migrations/
 
 EXPOSE 9000
