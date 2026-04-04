@@ -41,7 +41,7 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./certs:/root/certs
+      - ./certs:/certs
     depends_on:
       postgres:
         condition: service_healthy
