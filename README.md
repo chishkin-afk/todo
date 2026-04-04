@@ -130,7 +130,7 @@ Key environment variables:
 - `REDIS_ADDR`, `REDIS_PASSWORD`
 - `HTTP_ADDR` (e.g., `:9000`)
 - `SECRET_KEY` (for JWT signing)
-- `APP_ENV` (local, prod)
+- `APP_ENV` (dev, local, prod)
 
 ## 🧪 Testing
 
